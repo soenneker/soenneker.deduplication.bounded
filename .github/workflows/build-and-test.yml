@@ -20,37 +20,27 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Install dependencies with retry
-        shell: bash
-        run: |
-          retries=5
-          base_wait_time=15
-          exponent=2
+      - name: Restore tests
+        run: dotnet restore test/Soenneker.Deduplication.Bounded.Tests/Soenneker.Deduplication.Bounded.Tests.csproj --verbosity minimal
 
-          for i in $(seq 1 $retries); do
-            echo "::group::dotnet restore (attempt $i/$retries)"
-            if dotnet restore -v detailed; then
-              echo "::endgroup::"
-              echo "✅ dotnet restore succeeded on attempt $i."
-              break
-            else
-              echo "::endgroup::"
-              if [ "$i" -lt "$retries" ]; then
-                wait_time=$(( base_wait_time * (exponent ** (i - 1)) ))
-                echo "❌ dotnet restore failed (attempt $i). Retrying in ${wait_time}s…"
-                sleep "$wait_time"
-              else
-                echo "::error::dotnet restore failed after $retries attempts"
-                exit 1
-              fi
-            fi
-          done
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
+      - name: Build tests
+        run: dotnet build test/Soenneker.Deduplication.Bounded.Tests/Soenneker.Deduplication.Bounded.Tests.csproj --configuration Release --no-restore --verbosity minimal
 
       - name: Test
-        run: dotnet test test/Soenneker.Deduplication.Bounded.Tests/Soenneker.Deduplication.Bounded.Tests.csproj --no-restore --verbosity normal
+        run: dotnet test test/Soenneker.Deduplication.Bounded.Tests/Soenneker.Deduplication.Bounded.Tests.csproj --configuration Release --no-build --no-restore --verbosity normal
+
+      - name: Restore library
+        run: dotnet restore src/Soenneker.Deduplication.Bounded/Soenneker.Deduplication.Bounded.csproj --verbosity minimal
+
+      - name: Build library
+        run: dotnet build src/Soenneker.Deduplication.Bounded/Soenneker.Deduplication.Bounded.csproj --configuration Release --no-restore --verbosity minimal
 
       - name: Pack
-        run: dotnet pack --no-build --configuration Release --output .
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          dotnet pack src/Soenneker.Deduplication.Bounded/Soenneker.Deduplication.Bounded.csproj \
+            --configuration Release \
+            --no-build \
+            --no-restore \
+            --output ./artifacts
