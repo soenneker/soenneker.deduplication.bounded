@@ -37,7 +37,7 @@ jobs:
         run: dotnet build test/Soenneker.Deduplication.Bounded.Tests/Soenneker.Deduplication.Bounded.Tests.csproj --configuration Release --no-restore --verbosity minimal
 
       - name: Test
-        run: dotnet test test/Soenneker.Deduplication.Bounded.Tests/Soenneker.Deduplication.Bounded.Tests.csproj --configuration Release --no-build --no-restore --verbosity normal
+        run: dotnet test --project test/Soenneker.Deduplication.Bounded.Tests/Soenneker.Deduplication.Bounded.Tests.csproj --configuration Release --no-build --no-restore --verbosity normal
 
       - name: Restore library
         run: dotnet restore src/Soenneker.Deduplication.Bounded/Soenneker.Deduplication.Bounded.csproj --verbosity minimal
