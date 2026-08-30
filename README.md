@@ -30,7 +30,7 @@ Internally it hashes your input to a `ulong` using **XXH3 (XxHash3)** and stores
 * **Thread-safe**: safe to use concurrently from many threads
 * **High-throughput**: stores `ulong` hashes instead of strings
 * **Span-friendly**: avoids allocations via `ReadOnlySpan<char>` and `ReadOnlySpan<byte>`
-* **Optional hashing seed**: lets you rotate/partition hash space if desired
+* **Optional hashing seed**: lets independent instances use a different hash space
 * **Diagnostics-friendly**: exposes an approximate `Count`
 
 ## Quick start
@@ -85,6 +85,8 @@ bool removed2 = dedupe.TryRemove("some string".AsSpan());
 bool removed3 = dedupe.TryRemoveUtf8(utf8Bytes);
 ```
 
+Use the same representation for every operation on a key. The string and `ReadOnlySpan<char>` overloads hash UTF-16 characters, while the `Utf8` overloads hash the supplied bytes. Marking `"abc"` through the string API does not make the UTF-8 bytes for `abc` present.
+
 ### Properties
 
 ```csharp
@@ -121,7 +123,7 @@ If collision risk is unacceptable for your use case, you should store full keys 
 
 ## When to use this
 
-* Deduping inbound events/messages by ID for a fixed memory budget
+* Best-effort deduping of inbound events/messages by ID for a fixed memory budget
 * “Seen recently” protection in high-volume ingestion pipelines
 * De-duplicating phone numbers / emails / identifiers without storing raw values
 * Fast in-memory suppression lists
@@ -131,3 +133,4 @@ If collision risk is unacceptable for your use case, you should store full keys 
 * You need **exact** dedupe of raw strings (no collision tolerance)
 * You need strict FIFO/LRU eviction ordering guarantees
 * You need time-window expiration semantics (use a sliding window approach instead)
+* You need a security boundary for replay prevention or rate limiting; entries can be evicted and hashes can collide

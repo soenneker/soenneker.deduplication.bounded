@@ -14,7 +14,7 @@ namespace Soenneker.Deduplication.Bounded.Abstract;
 /// <item>message id dedupe</item>
 /// <item>phone number suppression lists</item>
 /// <item>event processing guards</item>
-/// <item>rate-limiting / replay protection</item>
+/// <item>best-effort duplicate suppression within a fixed memory budget</item>
 /// </list>
 /// 
 /// The underlying store is concurrent and eviction is **best-effort**, meaning the set may
