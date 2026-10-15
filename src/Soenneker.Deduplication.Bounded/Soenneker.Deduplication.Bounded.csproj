@@ -50,6 +50,6 @@
 
     <ItemGroup>
         <PackageReference Include="Soenneker.Hashing.XxHash" Version="4.0.118" />
-        <PackageReference Include="Soenneker.Sets.Concurrent.Bounded" Version="4.0.60" />
+        <PackageReference Include="Soenneker.Sets.Concurrent.Bounded" Version="4.0.61" />
     </ItemGroup>
 </Project>
